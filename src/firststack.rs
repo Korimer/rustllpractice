@@ -15,6 +15,7 @@ impl <T> ListHolder<T> {
     pub fn new() -> Self {
         ListHolder { head: ListItem::None }
     }
+
     pub fn add (&mut self, item: T) -> () {
         let temp = Box::new(
             mem::replace(&mut self.head,ListItem::None)
@@ -22,12 +23,30 @@ impl <T> ListHolder<T> {
         self.head = ListItem::Next(item, temp);
     }
 
+/*
+    pub fn pop(&mut self) -> Option<T> {
+        let poppeditem;
+        let next;
+        match &self.head {
+            ListItem::None => {
+                poppeditem = None;
+                next = &ListItem::None;
+            },
+            ListItem::Next(itm,listitem) => {
+                poppeditem = Some(*itm);
+                next = &*listitem;
+            }
+        }
+        let temp: ListItem<T> = mem::replace(&mut self.head, *next);
+        return poppeditem;
+    }
+*/// Shared reference misery......
 }
 
 pub fn main() {
     let mut a = ListHolder::<i32>::new();
-    a.add(1);
-    a.add(2);
-
-    println!("{:?}",a);
+    for i in 0..10 {
+        a.add(i);
+    }
+    println!("{:?}",a)
 }
