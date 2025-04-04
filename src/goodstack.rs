@@ -16,13 +16,15 @@ enum Link<T> {
     Body(Box<Node<T>>)
 }
 
+impl <T> Default for Link<T> { fn default() -> Self { Link::Tail } }
+
 impl <T> Stack<T> {
     pub fn new() -> Self {
         Stack {head: Link::Tail}
     }
 
     pub fn push(&mut self, new: T) -> () {
-        let newnode = Node {next: mem::replace(&mut self.head, Link::Tail), value: new};
+        let newnode = Node {next: mem::take(&mut self.head), value: new};
         self.head = Link::Body(Box::new(newnode));
     }
 
@@ -39,10 +41,9 @@ impl <T> Stack<T> {
 
 impl <T> Drop for Stack<T> {
     fn drop(&mut self) {
-        let mut current = &mut self.head;
-        while let Link::Body(thing) = current {
-            let mut next = mem::replace(&mut thing.next, Link::Tail);
-            mem::swap(&mut next, &mut current);
+        let mut current = mem::take(&mut self.head);
+        while let Link::Body(mut thing) = current {
+            current = mem::take(&mut thing.next);
         }
     }
 }
