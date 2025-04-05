@@ -1,5 +1,5 @@
-mod goodstack;
+mod definitivestack;
 pub fn main() {
     println!("hello wroeld");
-    goodstack::main();
+    definitivestack::main();
 }
