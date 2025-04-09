@@ -1,5 +1,5 @@
-mod goodstack;
+mod rusticstack;
 pub fn main() {
     println!("hello wroeld");
-    goodstack::main();
+    rusticstack::main();
 }

@@ -1,4 +1,4 @@
-use std::mem;
+use std::{mem};
 #[derive(Debug)]
 pub struct Stack<T> {
     head: Link<T>
@@ -10,40 +10,59 @@ struct Node<T> {
     value: T
 }
 
-#[derive(Debug)]
-enum Link<T> {
-    Tail,
-    Body(Box<Node<T>>)
-}
-
-impl <T> Default for Link<T> { fn default() -> Self { Link::Tail } }
+type Link<T> = Option<Box<Node<T>>>;
 
 impl <T> Stack<T> {
     pub fn new() -> Self {
-        Stack {head: Link::Tail}
+        Stack {head: None}
     }
 
     pub fn push(&mut self, new: T) -> () {
         let newnode = Node {next: mem::take(&mut self.head), value: new};
-        self.head = Link::Body(Box::new(newnode));
+        self.head = Some(Box::new(newnode));
     }
 
     pub fn pop(&mut self) -> Option<T> {
-        match mem::replace(&mut self.head,Link::Tail) {
-            Link::Tail => None,
-            Link::Body(thing) => {
-                self.head = thing.next;
-                Some(thing.value)
+        mem::take(&mut self.head).map(
+            |itm| -> T {
+                self.head = itm.next;
+                itm.value
             }
-        }
+        )
     }
+
+    pub fn iter<'a>(&self) -> Iter<'a, T> {
+        Iter {next: self.head.as_ref().map(|item| -> &Node<T> {item})}
+    }    
 }
 
 impl <T> Drop for Stack<T> {
     fn drop(&mut self) {
         let mut current = mem::take(&mut self.head);
-        while let Link::Body(mut thing) = current {
+        while let Some(mut thing) = current {
             current = mem::take(&mut thing.next);
+        }
+    }
+}
+
+impl <T> Iterator for Stack<T> {
+    type Item = T;
+    fn next(&mut self) -> Option<Self::Item> {
+        self.pop()
+    }
+}
+
+pub struct Iter<'a, T> {
+    next: Option<&'a Node<T>>
+}
+impl <'a, T> Iterator for Iter<'a, T> {
+    type Item = &'a T;
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.next {
+            None => None,
+            Some => {
+                let 
+            }
         }
     }
 }
